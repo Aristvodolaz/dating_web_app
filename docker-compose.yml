@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - /app/node_modules

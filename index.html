@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Свидание 🌸" />
+  <title>Приглашение на свидание 🌸</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,400;0,600;0,700;0,800;0,900;1,400&family=Pacifico&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* iOS tap highlight & momentum scroll */
+    * { -webkit-tap-highlight-color: transparent; }
+    body { -webkit-overflow-scrolling: touch; }
+
+    :root {
+      --pink:     #e91e63;
+      --pink-lt:  #f8bbd0;
+      --pink-bg:  #fce4ec;
+      --purple:   #9c27b0;
+      --purple-lt:#e1bee7;
+      --purple-bg:#f3e5f5;
+      --blue:     #1565c0;
+      --blue-lt:  #90caf9;
+      --blue-bg:  #e3f2fd;
+      --cream:    #fff5f7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Nunito', sans-serif;
+      background: var(--cream);
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      overflow-x: hidden;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    /* ========== FLOATING BG ========== */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .bg-item {
+      position: absolute;
+      font-size: 1.4rem;
+      animation: floatUp linear infinite;
+      opacity: 0;
+      user-select: none;
+    }
+    @keyframes floatUp {
+      0%   { transform: translateY(105vh) rotate(-10deg); opacity: 0; }
+      10%  { opacity: 0.22; }
+      90%  { opacity: 0.22; }
+      100% { transform: translateY(-8vh) rotate(10deg); opacity: 0; }
+    }
+
+    /* ========== PAGES ========== */
+    .page {
+      display: none;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 2rem 1.2rem;
+      padding-left: max(1.2rem, env(safe-area-inset-left));
+      padding-right: max(1.2rem, env(safe-area-inset-right));
+      padding-bottom: max(2rem, env(safe-area-inset-bottom));
+      position: relative;
+      z-index: 1;
+    }
+    .page.active {
+      display: flex;
+      animation: pageIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+    @keyframes pageIn {
+      from { opacity: 0; transform: scale(0.92) translateY(16px); }
+      to   { opacity: 1; transform: scale(1)    translateY(0); }
+    }
+
+    /* ========== PAGE 1 — INVITATION ========== */
+    #p1 { background: linear-gradient(145deg, #fff0f5 0%, #fce4ec 55%, #fff8e7 100%); }
+
+    .inv-card {
+      background: #fff;
+      border-radius: 36px;
+      padding: 2.8rem 3.2rem;
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 24px 70px rgba(233,30,99,.14), 0 4px 16px rgba(233,30,99,.08);
+      border: 3px solid var(--pink-lt);
+    }
+
+    .bear {
+      font-size: 5.5rem;
+      display: block;
+      margin-bottom: .4rem;
+      animation: bearWiggle 2.4s ease-in-out infinite;
+      transform-origin: center bottom;
+    }
+    @keyframes bearWiggle {
+      0%,100% { transform: rotate(-6deg) scale(1); }
+      25%      { transform: rotate(5deg)  scale(1.06); }
+      50%      { transform: rotate(-3deg) scale(1.01); }
+      75%      { transform: rotate(4deg)  scale(1.04); }
+    }
+
+    .inv-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.2rem;
+      color: var(--pink);
+      line-height: 1.3;
+      margin-bottom: .5rem;
+    }
+
+    .inv-sub {
+      font-size: 1rem;
+      color: #f48fb1;
+      margin-bottom: .4rem;
+    }
+
+    .inv-deco { font-size: 1.3rem; letter-spacing: .35rem; margin: .9rem 0 1.4rem; }
+
+    .inv-chips {
+      display: flex;
+      justify-content: center;
+      gap: .5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.8rem;
+    }
+    .chip {
+      background: var(--pink-bg);
+      border: 1.5px solid var(--pink-lt);
+      border-radius: 20px;
+      padding: .28rem .9rem;
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--pink);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-yes {
+      background: linear-gradient(135deg, #f06292, var(--pink));
+      color: #fff;
+      border: none;
+      padding: .9rem 2.4rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 900;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(233,30,99,.35);
+      transition: transform .2s, box-shadow .2s;
+      letter-spacing: .02em;
+      min-height: 44px;
+      touch-action: manipulation;
+      -webkit-appearance: none;
+    }
+    .btn-yes:hover  { transform: translateY(-4px) scale(1.05); box-shadow: 0 14px 32px rgba(233,30,99,.45); }
+    .btn-yes:active { transform: scale(.97); }
+
+    .btn-no {
+      background: #fff;
+      color: #f48fb1;
+      border: 2.5px solid var(--pink-lt);
+      padding: .9rem 2.4rem;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: background .2s;
+      position: fixed;
+      z-index: 999;
+      white-space: nowrap;
+      min-height: 44px;
+      touch-action: manipulation;
+      -webkit-appearance: none;
+    }
+
+    /* ========== PAGE 2 — CUISINE ========== */
+    #p2 { background: linear-gradient(145deg, #f3e5f5 0%, #ede7f6 55%, #e8f5e9 100%); }
+
+    .step-badge {
+      background: #fff;
+      border: 2px solid var(--purple-lt);
+      border-radius: 20px;
+      padding: .38rem 1.2rem;
+      font-size: .78rem;
+      font-weight: 800;
+      color: var(--purple);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: .3rem;
+    }
+    .section-sub {
+      font-size: .95rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .cuisine-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      max-width: 520px;
+      width: 100%;
+    }
+    @media (max-width: 480px) {
+      .cuisine-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .cuisine-card {
+      background: #fff;
+      border-radius: 22px;
+      padding: 1.4rem .8rem;
+      text-align: center;
+      cursor: pointer;
+      border: 2.5px solid var(--purple-lt);
+      box-shadow: 0 4px 14px rgba(156,39,176,.08);
+      transition: transform .25s cubic-bezier(0.34,1.56,0.64,1), border-color .2s, box-shadow .2s;
+    }
+    .cuisine-card:hover {
+      transform: translateY(-7px) scale(1.04);
+      border-color: #ab47bc;
+      box-shadow: 0 12px 28px rgba(156,39,176,.18);
+    }
+    .cuisine-emoji { font-size: 2.4rem; margin-bottom: .4rem; }
+    .cuisine-name  { font-size: .9rem; font-weight: 800; color: #6a1b9a; }
+    .cuisine-vibe  { font-size: .72rem; color: #ce93d8; margin-top: .2rem; }
+
+    /* ========== PAGE 3 — RESTAURANTS ========== */
+    #p3 {
+      background: linear-gradient(145deg, #e3f2fd 0%, #e8eaf6 55%, #fce4ec 100%);
+      justify-content: flex-start;
+      padding-top: 3rem;
+    }
+
+    .p3-head { text-align: center; margin-bottom: 1.5rem; width: 100%; max-width: 640px; }
+
+    .cuisine-tag {
+      display: inline-block;
+      background: #fff;
+      border: 2px solid var(--blue-lt);
+      border-radius: 20px;
+      padding: .3rem 1rem;
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--blue);
+      margin-bottom: .6rem;
+    }
+
+    .rest-list { display: flex; flex-direction: column; gap: .75rem; width: 100%; max-width: 640px; }
+
+    .rest-card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      cursor: pointer;
+      border: 2px solid var(--blue-bg);
+      box-shadow: 0 3px 12px rgba(33,150,243,.07);
+      transition: transform .25s cubic-bezier(0.34,1.56,0.64,1), border-color .2s, box-shadow .2s;
+    }
+    .rest-card:hover {
+      transform: translateX(7px) scale(1.01);
+      border-color: var(--blue-lt);
+      box-shadow: 0 10px 26px rgba(33,150,243,.15);
+    }
+
+    .rest-photo {
+      width: 90px;
+      height: 72px;
+      border-radius: 14px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: #e3f2fd;
+      display: block;
+    }
+    @media (max-width: 500px) {
+      .rest-photo { width: 68px; height: 56px; }
+    }
+
+    .rest-body { flex: 1; min-width: 0; }
+    .rest-name { font-size: 1.05rem; font-weight: 800; color: #1a237e; margin-bottom: .18rem; }
+    .rest-addr { font-size: .78rem; color: #90a4ae; margin-bottom: .35rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rest-tags { display: flex; gap: .35rem; flex-wrap: wrap; }
+    .r-tag {
+      font-size: .68rem;
+      padding: .18rem .58rem;
+      border-radius: 20px;
+      background: #e8eaf6;
+      color: #5c6bc0;
+      font-weight: 700;
+    }
+    .rest-price { font-size: 1.1rem; font-weight: 800; color: var(--blue-lt); flex-shrink: 0; }
+
+    .back-btn {
+      margin-top: 1.2rem;
+      background: transparent;
+      border: 2px solid var(--blue-lt);
+      color: var(--blue);
+      padding: .52rem 1.6rem;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .back-btn:hover { background: var(--blue-bg); }
+
+    /* ========== PAGE 4 — SUCCESS ========== */
+    #p4 { background: linear-gradient(145deg, #fff8e1 0%, #fce4ec 50%, #f3e5f5 100%); }
+
+    .success-card {
+      background: #fff;
+      border-radius: 32px;
+      padding: 2.4rem 2.8rem;
+      max-width: 430px;
+      width: 100%;
+      text-align: center;
+      border: 3px solid var(--pink-lt);
+      box-shadow: 0 20px 60px rgba(233,30,99,.13);
+    }
+
+    .confetti-row {
+      font-size: 2.2rem;
+      letter-spacing: .35rem;
+      margin-bottom: 1rem;
+      display: block;
+      animation: bounceY 0.7s ease-in-out infinite alternate;
+    }
+    @keyframes bounceY {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-9px); }
+    }
+
+    .success-title {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.1rem;
+      color: var(--pink);
+      margin-bottom: .4rem;
+    }
+    .success-sub { font-size: 1rem; color: #f48fb1; margin-bottom: 1.5rem; }
+
+    .chosen-block {
+      background: linear-gradient(135deg, var(--pink-bg), #f8bbd0);
+      border-radius: 18px;
+      padding: 1.3rem 1.6rem;
+      margin-bottom: .6rem;
+      border: 2px dashed #f48fb1;
+    }
+    .chosen-label { font-size: .75rem; font-weight: 800; color: #ad1457; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .3rem; }
+    .chosen-rest  { font-family: 'Pacifico', cursive; font-size: 1.6rem; color: #c2185b; }
+    .chosen-addr  { font-size: .85rem; color: #ec407a; margin-top: .2rem; }
+
+    .success-note { font-size: .9rem; color: #f48fb1; font-style: italic; margin-top: .7rem; line-height: 1.6; }
+
+    .restart-btn {
+      margin-top: 1.2rem;
+      background: transparent;
+      border: 2px solid var(--pink-lt);
+      color: #f48fb1;
+      padding: .5rem 1.6rem;
+      border-radius: 50px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .restart-btn:hover { background: var(--pink-bg); }
+  </style>
+</head>
+<body>
+
+<!-- Floating background -->
+<div id="bg-canvas"></div>
+
+<!-- ====== PAGE 1: INVITATION ====== -->
+<div id="p1" class="page active">
+  <div class="inv-card">
+    <span class="bear">🐱</span>
+    <div class="inv-title">Привет!<br>Пойдёшь со мной<br>на свидание? 🌸</div>
+    <div class="inv-deco">🌷 🤍 🌷</div>
+    <div class="inv-chips">
+      <span class="chip">🌙 сегодня</span>
+      <span class="chip">🍽️ ужин</span>
+    </div>
+    <div class="btn-row">
+      <button class="btn-yes" onclick="go('p2')">Да, конечно! 💖</button>
+      <button class="btn-no" id="noBtn"
+              onmouseenter="flee()"
+              ontouchstart="flee()">Нет 🙈</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PAGE 2: CUISINE ====== -->
+<div id="p2" class="page">
+  <div class="step-badge">🎉 Ура! Шаг 1 из 2</div>
+  <h2 class="section-title" style="color:#7b1fa2">Что будем кушать? 🍴</h2>
+  <p class="section-sub" style="color:#ce93d8">Выбери что-нибудь вкусненькое~</p>
+  <div class="cuisine-grid">
+    <div class="cuisine-card" onclick="showRests('italian')">
+      <div class="cuisine-emoji">🍝</div>
+      <div class="cuisine-name">Итальянская</div>
+      <div class="cuisine-vibe">паста & пицца</div>
+    </div>
+    <div class="cuisine-card" onclick="showRests('japanese')">
+      <div class="cuisine-emoji">🍣</div>
+      <div class="cuisine-name">Японская</div>
+      <div class="cuisine-vibe">суши & роллы</div>
+    </div>
+    <div class="cuisine-card" onclick="showRests('georgian')">
+      <div class="cuisine-emoji">🫕</div>
+      <div class="cuisine-name">Грузинская</div>
+      <div class="cuisine-vibe">хинкали & вино</div>
+    </div>
+    <div class="cuisine-card" onclick="showRests('french')">
+      <div class="cuisine-emoji">🥐</div>
+      <div class="cuisine-name">Французская</div>
+      <div class="cuisine-vibe">бистро & шампань</div>
+    </div>
+    <div class="cuisine-card" onclick="showRests('russian')">
+      <div class="cuisine-emoji">🥘</div>
+      <div class="cuisine-name">Русская</div>
+      <div class="cuisine-vibe">авторская кухня</div>
+    </div>
+    <div class="cuisine-card" onclick="showRests('steakhouse')">
+      <div class="cuisine-emoji">🥩</div>
+      <div class="cuisine-name">Стейки</div>
+      <div class="cuisine-vibe">мясо & огонь</div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PAGE 3: RESTAURANTS ====== -->
+<div id="p3" class="page">
+  <div class="p3-head">
+    <div class="cuisine-tag" id="cuisineTag">🍝 Итальянская</div>
+    <h2 class="section-title" style="color:#283593">Куда пойдём? 📍</h2>
+    <p class="section-sub" style="color:#90caf9">Нажми на ресторан, который нравится</p>
+  </div>
+  <div class="rest-list" id="restList"></div>
+  <button class="back-btn" onclick="go('p2')">← другая кухня</button>
+</div>
+
+<!-- ====== PAGE 4: SUCCESS ====== -->
+<div id="p4" class="page">
+  <div class="success-card">
+    <span class="confetti-row">🎊 🌸 🎊</span>
+    <div class="success-title">Договорились! 💕</div>
+    <p class="success-sub">Сегодня вечером идём сюда:</p>
+    <div class="chosen-block">
+      <div class="chosen-label">📍 Наш ресторан</div>
+      <div class="chosen-rest" id="chosenName">—</div>
+      <div class="chosen-addr" id="chosenAddr">—</div>
+    </div>
+    <button class="restart-btn" onclick="go('p1')">↩ начать заново</button>
+  </div>
+</div>
+
+<script>
+  const DB = {
+    italian: {
+      label: '🍝 Итальянская',
+      list: [
+        { n:'Probka',            a:'Цветной бульвар, 2',    tags:['Паста','Натуральные вина','Уютно'],     p:'₽₽₽',  img:'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=200&h=140&fit=crop&auto=format' },
+        { n:'Sartoria Lamberti', a:'Болотная наб., 9',      tags:['Вид на реку','Романтично','Авторская'], p:'₽₽₽₽', img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=140&fit=crop&auto=format' },
+        { n:'Semplice',          a:'Дмитровка, 3',          tags:['Пицца','Центр','Тихо'],                 p:'₽₽₽',  img:'https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=200&h=140&fit=crop&auto=format' },
+        { n:'Latteria',          a:'Малая Бронная, 2',      tags:['Уютно','Домашнее','Камерно'],           p:'₽₽',   img:'https://images.unsplash.com/photo-1466978913421-dad2ebd01d17?w=200&h=140&fit=crop&auto=format' },
+      ]
+    },
+    japanese: {
+      label: '🍣 Японская',
+      list: [
+        { n:'Sumosan',    a:'Тверская, 28',           tags:['Омакасе','Суши-бар','Икра'],          p:'₽₽₽₽', img:'https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=200&h=140&fit=crop&auto=format' },
+        { n:'Nabi',       a:'Малая Никитская, 27',    tags:['Рамен','Татаки','Саке'],              p:'₽₽₽',  img:'https://images.unsplash.com/photo-1569050467447-ce54b3bbc37d?w=200&h=140&fit=crop&auto=format' },
+        { n:'Tatemichi',  a:'Патриаршие пруды',       tags:['Chef table','Эксклюзивно','Омакасе'], p:'₽₽₽₽', img:'https://images.unsplash.com/photo-1553621042-f6e147245754?w=200&h=140&fit=crop&auto=format' },
+        { n:'Koji',       a:'Пречистенская наб., 11', tags:['Панорама','Фьюжн','Вид на реку'],     p:'₽₽₽',  img:'https://images.unsplash.com/photo-1617196034183-421b4040ed20?w=200&h=140&fit=crop&auto=format' },
+      ]
+    },
+    georgian: {
+      label: '🫕 Грузинская',
+      list: [
+        { n:'Мама Тута', a:'Бол. Никитская, 24', tags:['Хинкали','Оджахури','Чача'],           p:'₽₽',  img:'https://images.unsplash.com/photo-1600891964599-f61ba0e24092?w=200&h=140&fit=crop&auto=format' },
+        { n:'Казбек',    a:'Тверская, 18/1',      tags:['Живая музыка','Хачапури','Изысканно'], p:'₽₽₽', img:'https://images.unsplash.com/photo-1544025162-d76694265947?w=200&h=140&fit=crop&auto=format' },
+        { n:'Batumi',    a:'Сретенский бул., 7',  tags:['Морепродукты','Уютно','Атмосфера'],    p:'₽₽',  img:'https://images.unsplash.com/photo-1559339352-11d035aa65de?w=200&h=140&fit=crop&auto=format' },
+        { n:'Сахли',     a:'Остоженка, 11',       tags:['Домашнее','Ткемали','Тихо'],           p:'₽₽',  img:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200&h=140&fit=crop&auto=format' },
+      ]
+    },
+    french: {
+      label: '🥐 Французская',
+      list: [
+        { n:'Comme il Faut',       a:'Малая Бронная, 22', tags:['Бистро','Устрицы','Шампанское'], p:'₽₽₽',  img:'https://images.unsplash.com/photo-1424847651672-bf20a4b0982b?w=200&h=140&fit=crop&auto=format' },
+        { n:'Chateau de Fantomas', a:'Ветошный пер., 9',  tags:['Романтика','Антураж','Классика'], p:'₽₽₽₽', img:'https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?w=200&h=140&fit=crop&auto=format' },
+        { n:'Le Bouchon',          a:'Кузнецкий мост, 6', tags:['Трюфель','Бургундия','Уютно'],   p:'₽₽₽',  img:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=140&fit=crop&auto=format' },
+        { n:'Pinot',               a:'Патриаршие пруды',  tags:['Вина','Сыры','Вечерний'],        p:'₽₽',   img:'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=200&h=140&fit=crop&auto=format' },
+      ]
+    },
+    russian: {
+      label: '🥘 Русская',
+      list: [
+        { n:'Белуга',     a:'Кутузовский просп., 2/1', tags:['Икра','Роскошь','Белуга'],          p:'₽₽₽₽', img:'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=200&h=140&fit=crop&auto=format' },
+        { n:'Матрёшка',   a:'Бол. Москворецкая, 6',   tags:['Вид на Кремль','Борщ','Атмосфера'],  p:'₽₽₽',  img:'https://images.unsplash.com/photo-1537047902294-62a40c20a6ae?w=200&h=140&fit=crop&auto=format' },
+        { n:'Северяне',   a:'Среднефонтанная, 3',     tags:['Авторская','Сезонная','Модерн'],      p:'₽₽₽',  img:'https://images.unsplash.com/photo-1592417817098-8fd3d9eb14a5?w=200&h=140&fit=crop&auto=format' },
+        { n:'Dr. Живаго', a:'Манежная пл., 1',        tags:['Центр','Пельмени','Антураж'],         p:'₽₽₽',  img:'https://images.unsplash.com/photo-1555244162-803834f70033?w=200&h=140&fit=crop&auto=format' },
+      ]
+    },
+    steakhouse: {
+      label: '🥩 Стейки',
+      list: [
+        { n:'Elektra',    a:'Малая Дмитровка, 4', tags:['Ribeye','Вагю','Угольный гриль'], p:'₽₽₽₽', img:'https://images.unsplash.com/photo-1558030006-450675393462?w=200&h=140&fit=crop&auto=format' },
+        { n:'Бизон',      a:'Новинский бул., 31', tags:['Стейки','Бургер','Whiskey'],      p:'₽₽₽',  img:'https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=200&h=140&fit=crop&auto=format' },
+        { n:'Тартар Тар', a:'Мясницкая, 15',      tags:['Тартар','Гриль','Мраморное'],     p:'₽₽₽',  img:'https://images.unsplash.com/photo-1544025162-d76694265947?w=200&h=140&fit=crop&auto=format' },
+        { n:'Goodman',    a:'Тверская, 23',        tags:['Dry Aged','Сочно','Классика'],    p:'₽₽₽',  img:'https://images.unsplash.com/photo-1432139509613-5c4255815697?w=200&h=140&fit=crop&auto=format' },
+      ]
+    }
+  };
+
+  function go(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function showRests(type) {
+    const d = DB[type];
+    document.getElementById('cuisineTag').textContent = d.label;
+    document.getElementById('restList').innerHTML = d.list.map(r => `
+      <div class="rest-card" onclick="pick('${r.n.replace(/'/g,"\\'")}','${r.a.replace(/'/g,"\\'")}','${d.label.replace(/'/g,"\\'")}')">
+        <img class="rest-photo" src="${r.img}" alt="${r.n}" loading="lazy" onerror="this.style.display='none'" />
+        <div class="rest-body">
+          <div class="rest-name">${r.n}</div>
+          <div class="rest-addr">📍 ${r.a}</div>
+          <div class="rest-tags">${r.tags.map(t => `<span class="r-tag">${t}</span>`).join('')}</div>
+        </div>
+        <div class="rest-price">${r.p}</div>
+      </div>
+    `).join('');
+    go('p3');
+  }
+
+  function pick(name, addr, cuisine) {
+    document.getElementById('chosenName').textContent = name;
+    document.getElementById('chosenAddr').textContent = addr;
+    go('p4');
+    fetch('/api/notify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ restaurant: name, address: addr, cuisine })
+    }).catch(() => {});
+  }
+
+  /* No-button runs away */
+  function flee() {
+    const btn = document.getElementById('noBtn');
+    const pad = 90;
+    const x = pad + Math.random() * (window.innerWidth  - btn.offsetWidth  - pad * 2);
+    const y = pad + Math.random() * (window.innerHeight - btn.offsetHeight - pad * 2);
+    btn.style.left = x + 'px';
+    btn.style.top  = y + 'px';
+  }
+
+  /* Position No-button initially near Yes-button */
+  window.addEventListener('load', () => {
+    const yes = document.querySelector('.btn-yes');
+    const btn = document.getElementById('noBtn');
+    const r   = yes.getBoundingClientRect();
+    btn.style.left = (r.right + 12) + 'px';
+    btn.style.top  = r.top + 'px';
+  });
+
+  /* Floating background emojis */
+  (function spawnBg() {
+    const pool = ['💕','🌸','💗','✨','🌷','💖','🌼','💝','🎀','🍓'];
+    const wrap = document.getElementById('bg-canvas');
+    for (let i = 0; i < 26; i++) {
+      const el = document.createElement('div');
+      el.className = 'bg-item';
+      el.textContent = pool[Math.floor(Math.random() * pool.length)];
+      el.style.left              = Math.random() * 100 + '%';
+      el.style.fontSize          = (0.9 + Math.random() * 1.4) + 'rem';
+      el.style.animationDuration = (7 + Math.random() * 9) + 's';
+      el.style.animationDelay    = '-' + (Math.random() * 12) + 's';
+      wrap.appendChild(el);
+    }
+  })();
+</script>
+</body>
+</html>
