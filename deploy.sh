@@ -4,7 +4,7 @@ set -e
 echo "🚀 Деплой dating-invite..."
 
 # 1. Обновить код
-git pull origin main
+git pull origin master
 
 # 2. Скопировать .env если его нет
 if [ ! -f .env ]; then
